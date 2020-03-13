@@ -65,13 +65,22 @@ player1 = RandomPlayer()
 player2 = RandomPlayer()
 board = Board()
 
-result = play_game(board, player1, player2)
-print_board(board)
-if result == GameResult.CROSS_WIN:
-    print("Cross won")
-elif result == GameResult.NAUGHT_WIN:
-    print("Naught won")
-else:
-    print("Draw")
+game_count = 100000
+cross_count = 0
+naught_count = 0
+draw_count = 0
+for _ in range(game_count):
+    result = play_game(board, player1, player2)
+    # print_board(board)
+    if result == GameResult.CROSS_WIN:
+        cross_count+=1
+    elif result == GameResult.NAUGHT_WIN:
+        naught_count+=1
+    else:
+        draw_count+=1
 
+print("After {} game we have draws: {}, cross wins: {}, and naught wins: {}.".format(
+    game_count, draw_count, cross_count, naught_count))
 
+print("Which gives percentages of draws : cross : naught of about {:.2%} : {:.2%} : {:.2%}".format(
+    draw_count / game_count, cross_count / game_count, naught_count / game_count))
