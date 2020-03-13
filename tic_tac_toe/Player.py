@@ -3,7 +3,7 @@
 #
 from abc import ABC, abstractmethod
 
-from tictactoe.Board import Board, GameResult
+from tic_tac_toe.Board import Board, GameResult
 
 
 class Player(ABC):
