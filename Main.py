@@ -1,7 +1,7 @@
 # import sys
 # sys.path.append('')
 from IPython.display import HTML, display
-from Board import Board, GameResult, CROSS, NAUGHT
+from tictactoe.Board import Board, GameResult, CROSS, NAUGHT
 
 '''
 Doesn't work for VSCode
