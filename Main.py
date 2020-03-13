@@ -4,6 +4,8 @@ from IPython.display import HTML, display
 from tic_tac_toe.Board import Board, GameResult, CROSS, NAUGHT
 from tic_tac_toe.Player import Player
 from tic_tac_toe.RandomPlayer import RandomPlayer
+from tic_tac_toe.MinMaxAgent import MinMaxAgent
+from tic_tac_toe.RndMinMaxAgent import RndMinMaxAgent
 
 def print_board(board):
     '''
@@ -61,26 +63,29 @@ def play_game(board: Board, player1: Player, player2: Player):
     player2.final_result(final_result)
     return final_result
 
-player1 = RandomPlayer()
-player2 = RandomPlayer()
+def battle(player1: Player = RandomPlayer(), player2: Player = RandomPlayer(), num_games: int = 100000):
+    board = Board()
+    draw_count = 0
+    cross_count = 0
+    naught_count = 0
+    for _ in range(num_games):
+        result = play_game(board, player1, player2)
+        if result == GameResult.CROSS_WIN:
+            cross_count += 1
+        elif result == GameResult.NAUGHT_WIN:
+            naught_count += 1
+        else:
+            draw_count += 1
+
+    print("After {} game we have draws: {}, Player 1 wins: {}, and Player 2 wins: {}.".format(
+        num_games, draw_count, cross_count, naught_count))
+    print("Which gives percentages of draws: {:.2%}, Player 1 wins: {:.2%}, and Player 2 wins:  {:.2%}".format(
+        draw_count / num_games, cross_count / num_games, naught_count / num_games))
+
+
+player1 = RndMinMaxAgent()
+player2 = RndMinMaxAgent()
 board = Board()
 
 game_count = 100000
-cross_count = 0
-naught_count = 0
-draw_count = 0
-for _ in range(game_count):
-    result = play_game(board, player1, player2)
-    # print_board(board)
-    if result == GameResult.CROSS_WIN:
-        cross_count+=1
-    elif result == GameResult.NAUGHT_WIN:
-        naught_count+=1
-    else:
-        draw_count+=1
-
-print("After {} game we have draws: {}, cross wins: {}, and naught wins: {}.".format(
-    game_count, draw_count, cross_count, naught_count))
-
-print("Which gives percentages of draws : cross : naught of about {:.2%} : {:.2%} : {:.2%}".format(
-    draw_count / game_count, cross_count / game_count, naught_count / game_count))
+battle(player1, player2)
