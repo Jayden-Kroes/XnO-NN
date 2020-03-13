@@ -3,11 +3,12 @@
 from IPython.display import HTML, display
 from tic_tac_toe.Board import Board, GameResult, CROSS, NAUGHT
 from tic_tac_toe.Player import Player
+from tic_tac_toe.RandomPlayer import RandomPlayer
 
-'''
-Doesn't work for VSCode
-'''
 def print_board(board):
+    '''
+    Doesn't work for VSCode
+    '''
     board.print_board()
     return
     # display(HTML("""
@@ -60,5 +61,17 @@ def play_game(board: Board, player1: Player, player2: Player):
     player2.final_result(final_result)
     return final_result
 
-play_random_game()
+player1 = RandomPlayer()
+player2 = RandomPlayer()
+board = Board()
+
+result = play_game(board, player1, player2)
+print_board(board)
+if result == GameResult.CROSS_WIN:
+    print("Cross won")
+elif result == GameResult.NAUGHT_WIN:
+    print("Naught won")
+else:
+    print("Draw")
+
 
