@@ -6,10 +6,15 @@
 
 import numpy as np
 import tensorflow as tf
-from tic_tac_toe.TFSessionManager import TFSessionManager as TFSN
+# from tic_tac_toe.TFSessionManager import TFSessionManager as TFSN
 
 from tic_tac_toe.Board import Board, BOARD_SIZE, EMPTY, CROSS, NAUGHT
 from tic_tac_toe.Player import Player, GameResult
+
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam
+
 
 
 class QNetwork:
@@ -30,44 +35,51 @@ class QNetwork:
         self.q_values = None
         self.probabilities = None
         self.train_step = None
+        #self.graph = None
         self.build_graph(name)
 
-    def add_dense_layer(self, input_tensor: tf.Tensor, output_size: int, activation_fn=None,
-                        name: str = None) -> tf.Tensor:
-        """
-        Adds a dense Neural Net layer to network input_tensor
-        :param input_tensor: The layer to which we should add the new layer
-        :param output_size: The output size of the new layer
-        :param activation_fn: The activation function for the new layer, or None if no activation function
-        should be used
-        :param name: The optional name of the layer. Useful for saving a loading a TensorFlow graph
-        :return: A new dense layer attached to the `input_tensor`
-        """
-        return tf.layers.dense(input_tensor, output_size, activation=activation_fn,
-                               kernel_initializer=tf.contrib.layers.variance_scaling_initializer(),
-                               name=name)
+    # def add_dense_layer(self, input_tensor: tf.Tensor, output_size: int, activation_fn=None,
+    #                     name: str = None) -> tf.Tensor:
+    #     """
+    #     Adds a dense Neural Net layer to network input_tensor
+    #     :param input_tensor: The layer to which we should add the new layer
+    #     :param output_size: The output size of the new layer
+    #     :param activation_fn: The activation function for the new layer, or None if no activation function
+    #     should be used
+    #     :param name: The optional name of the layer. Useful for saving a loading a TensorFlow graph
+    #     :return: A new dense layer attached to the `input_tensor`
+    #     """
+    #     return tf.layers.dense(input_tensor, output_size, activation=activation_fn,
+    #                            kernel_initializer=tf.contrib.layers.variance_scaling_initializer(),
+    #                            name=name)
 
     def build_graph(self, name: str):
         """
         Builds a new TensorFlow graph with scope `name`
         :param name: The scope for the graph. Needs to be unique for the session.
         """
-        with tf.variable_scope(name):
-            self.input_positions = tf.placeholder(tf.float32, shape=(None, BOARD_SIZE * 3), name='inputs')
+        # with tf.variable_scope(name):
+            # self.input_positions = tf.placeholder(tf.float32, shape=(None, BOARD_SIZE * 3), name='inputs')
+            # self.target_input = tf.placeholder(tf.float32, shape=(None, BOARD_SIZE), name='targets')
+            # net = self.input_positions
+            # net = self.add_dense_layer(net, BOARD_SIZE * 3 * 9, tf.nn.relu)
+            # self.q_values = self.add_dense_layer(net, BOARD_SIZE, name='q_values')
+            # self.probabilities = tf.nn.softmax(self.q_values, name='probabilities')
+            # mse = tf.losses.mean_squared_error(predictions=self.q_values, labels=self.target_input)
+            # self.train_step = tf.train.GradientDescentOptimizer(learning_rate=self.learningRate).minimize(mse, name='train')
 
-            self.target_input = tf.placeholder(tf.float32, shape=(None, BOARD_SIZE), name='targets')
+        input_size =  BOARD_SIZE * 3
+        self.graph = Sequential()
+        layer = Dense(128, input_dim=input_size, activation = 'relu')
+        self.graph.add(layer)
 
-            net = self.input_positions
+        self.q_values = Dense(BOARD_SIZE, activation='relu', name='q_values')
+        self.graph.add(self.q_values)
 
-            net = self.add_dense_layer(net, BOARD_SIZE * 3 * 9, tf.nn.relu)
+        #self.probabilities = Dense(BOARD_SIZE, activation='softmax', name='probabilities')
+        #self.graph.add(self.probabilities)
 
-            self.q_values = self.add_dense_layer(net, BOARD_SIZE, name='q_values')
-
-            self.probabilities = tf.nn.softmax(self.q_values, name='probabilities')
-            mse = tf.losses.mean_squared_error(predictions=self.q_values, labels=self.target_input)
-            self.train_step = tf.train.GradientDescentOptimizer(learning_rate=self.learningRate).minimize(mse,
-                                                                                                          name='train')
-
+        self.graph.compile(loss='mse', optimizer=Adam())
 
 class NNQPlayer(Player):
     """
@@ -148,9 +160,16 @@ class NNQPlayer(Player):
         :param input_pos: The feature vector to be fed into the Neural Network.
         :return: A tuple of probabilities and q values of all actions (including illegal ones).
         """
-        probs, qvalues = TFSN.get_session().run([self.nn.probabilities, self.nn.q_values],
-                                                feed_dict={self.nn.input_positions: [input_pos]})
-        return probs[0], qvalues[0]
+        # probs, qvalues = TFSN.get_session().run(
+        # [self.nn.probabilities, self.nn.q_values],
+        #  feed_dict={self.nn.input_positions: [input_pos]})
+        input_pos.shape = (1,27)
+
+        self.nn.graph.predict(input_pos)
+        probs, qvalues = self.nn.probabilities.output, self.nn.q_values.output
+        print(probs)
+        print(qvalues)
+        return probs, qvalues
 
     def move(self, board: Board) -> (GameResult, bool):
         """
@@ -223,5 +242,6 @@ class NNQPlayer(Player):
             nn_input = [self.board_state_to_nn_input(x) for x in self.board_position_log]
 
             # We run the training step with the recorded inputs and new Q value targets.
-            TFSN.get_session().run([self.nn.train_step],
-                                   feed_dict={self.nn.input_positions: nn_input, self.nn.target_input: targets})
+            # TFSN.get_session().run([self.nn.train_step],
+            #     feed_dict={self.nn.input_positions: nn_input, self.nn.target_input: targets})
+            self.nn.graph.fit(x=nn_input, y=targets)

@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\tic_tac_toe"
   ],
-  "SelectedNode": "\\Main.py",
+  "SelectedNode": "\\tic_tac_toe\\SimpleNNQPlayer.py",
   "PreviewInSolutionExplorer": false
 }

@@ -1,4 +1,4 @@
-from IPython.display import HTML, display
+# from IPython.display import HTML, display
 from tic_tac_toe.Board import Board, GameResult, CROSS, NAUGHT, EMPTY
 from tic_tac_toe.Player import Player
 from tic_tac_toe.RandomPlayer import RandomPlayer
@@ -6,7 +6,7 @@ from tic_tac_toe.MinMaxAgent import MinMaxAgent
 from tic_tac_toe.RndMinMaxAgent import RndMinMaxAgent
 from tic_tac_toe.TabularQPlayer import TQPlayer
 from tic_tac_toe.SimpleNNQPlayer import NNQPlayer
-from tic_tac_toe.TFSessionManager import TFSessionManager
+# from tic_tac_toe.TFSessionManager import TFSessionManager
 import tensorflow as tf
 import matplotlib
 import numpy as np
@@ -98,8 +98,8 @@ def eval_players(p1 : Player, p2 : Player, num_battles : int = 100, games_per_ba
     game_number = []
     counter = 0
     
-    TFSessionManager.set_session(tf.Session())
-    TFSessionManager.get_session().run(tf.global_variables_initializer())
+    # TFSessionManager.set_session(tf.Session())
+    # TFSessionManager.get_session().run(tf.global_variables_initializer())
 
     for i in range(num_battles):
         p1win, p2win, draw = battle(p1, p2, num_games=games_per_battle, silent=True)
@@ -118,11 +118,11 @@ def eval_players(p1 : Player, p2 : Player, num_battles : int = 100, games_per_ba
     plt.legend(loc=loc, shadow=True, fancybox=True, framealpha =0.7)
     plt.show()
 
-    TFSessionManager.set_session(None)
+    # TFSessionManager.set_session(None)
     return game_number, p1_wins, p2_wins, draws
 
 
-tf.reset_default_graph()    
+# tf.reset_default_graph()    
 
 nnplayer = NNQPlayer("QLearner1")
 rndplayer = RandomPlayer()
