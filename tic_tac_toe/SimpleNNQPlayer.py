@@ -5,6 +5,7 @@
 #
 
 import numpy as np
+import scipy
 import tensorflow as tf
 # from tic_tac_toe.TFSessionManager import TFSessionManager as TFSN
 
@@ -52,6 +53,7 @@ class QNetwork:
     #     return tf.layers.dense(input_tensor, output_size, activation=activation_fn,
     #                            kernel_initializer=tf.contrib.layers.variance_scaling_initializer(),
     #                            name=name)
+
 
     def build_graph(self, name: str):
         """
@@ -152,6 +154,10 @@ class NNQPlayer(Player):
             targets.append(target)
 
         return targets
+    
+    
+    def get_softmax(output):
+        return scipy.special.softmax(output)
 
     def get_probs(self, input_pos: np.ndarray) -> ([float], [float]):
         """
@@ -165,11 +171,9 @@ class NNQPlayer(Player):
         #  feed_dict={self.nn.input_positions: [input_pos]})
         input_pos.shape = (1,27)
 
-        self.nn.graph.predict(input_pos)
-        probs, qvalues = self.nn.probabilities.output, self.nn.q_values.output
-        print(probs)
-        print(qvalues)
-        return probs, qvalues
+        probs = self.nn.graph.predict(input_pos)
+        import scipy.special as spc
+        return probs[0], spc.softmax (probs[0])
 
     def move(self, board: Board) -> (GameResult, bool):
         """
@@ -240,8 +244,10 @@ class NNQPlayer(Player):
 
             # We convert the input states we have recorded to feature vectors to feed into the training.
             nn_input = [self.board_state_to_nn_input(x) for x in self.board_position_log]
+            _x = np.array(nn_input)
+            _y = np.array(targets)
 
             # We run the training step with the recorded inputs and new Q value targets.
             # TFSN.get_session().run([self.nn.train_step],
             #     feed_dict={self.nn.input_positions: nn_input, self.nn.target_input: targets})
-            self.nn.graph.fit(x=nn_input, y=targets)
+            self.nn.graph.fit(x=_x, y=_y)

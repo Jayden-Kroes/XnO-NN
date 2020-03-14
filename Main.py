@@ -1,4 +1,6 @@
 # from IPython.display import HTML, display
+import tic_tac_toe.SimpleNNQPlayer
+
 from tic_tac_toe.Board import Board, GameResult, CROSS, NAUGHT, EMPTY
 from tic_tac_toe.Player import Player
 from tic_tac_toe.RandomPlayer import RandomPlayer
