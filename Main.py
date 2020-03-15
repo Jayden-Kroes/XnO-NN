@@ -127,8 +127,8 @@ def eval_players(p1 : Player, p2 : Player, num_battles : int = 100, games_per_ba
 # tf.reset_default_graph()    
 
 nnplayer = NNQPlayer("QLearner1")
-rndplayer = RandomPlayer()
+nnplayer2 = NNQPlayer("QLearner2")
 
-game_number, p1_wins, p2_wins, draws = eval_players(nnplayer, rndplayer)
+game_number, p1_wins, p2_wins, draws = eval_players(nnplayer, nnplayer2)
 
 p = plt.plot(game_number, draws, 'r-', game_number, p1_wins, 'g-', game_number, p2_wins, 'b-')
