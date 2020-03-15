@@ -334,9 +334,14 @@ class EGreedyNNQPlayer(Player):
         :param input_pos: The feature vector to be fed into the Neural Network.
         :return: A tuple of probabilities and q values of all actions (including illegal ones).
         """
-        probs, qvalues = TFSN.get_session().run([self.nn.probabilities, self.nn.q_values],
-                                                feed_dict={self.nn.input_positions: [input_pos]})
-        return probs[0], qvalues[0]
+        # probs, qvalues = TFSN.get_session().run([self.nn.probabilities, self.nn.q_values],
+                                                # feed_dict={self.nn.input_positions: [input_pos]})
+        # return probs[0], qvalues[0]
+        input_pos.shape = (1,27)
+
+        probs = self.nn.graph.predict(input_pos)
+        import scipy.special as spc
+        return probs[0], spc.softmax (probs[0])
 
     def move(self, board: Board) -> (GameResult, bool):
         """
@@ -415,7 +420,9 @@ class EGreedyNNQPlayer(Player):
             nn_input = [self.board_state_to_nn_input(x) for x in self.board_position_log]
 
             # We run the training step with the recorded inputs and new Q value targets.
-            TFSN.get_session().run([self.nn.train_step],
-                                   feed_dict={self.nn.input_positions: nn_input, self.nn.target_input: targets})
-
+            # TFSN.get_session().run([self.nn.train_step],
+            #                        feed_dict={self.nn.input_positions: nn_input, self.nn.target_input: targets})
+            _x = np.array(nn_input)
+            _y = np.array(targets)
+            self.nn.graph.fit(x=_x, y=_y)
             self.random_move_prob *= self.random_move_decrease

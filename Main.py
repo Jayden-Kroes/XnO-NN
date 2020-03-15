@@ -7,7 +7,7 @@ from tic_tac_toe.RandomPlayer import RandomPlayer
 from tic_tac_toe.MinMaxAgent import MinMaxAgent
 from tic_tac_toe.RndMinMaxAgent import RndMinMaxAgent
 from tic_tac_toe.TabularQPlayer import TQPlayer
-from tic_tac_toe.SimpleNNQPlayer import NNQPlayer
+from tic_tac_toe.SimpleNNQPlayer import NNQPlayer, EGreedyNNQPlayer
 # from tic_tac_toe.TFSessionManager import TFSessionManager
 import tensorflow as tf
 import matplotlib
@@ -127,8 +127,10 @@ def eval_players(p1 : Player, p2 : Player, num_battles : int = 100, games_per_ba
 # tf.reset_default_graph()    
 
 nnplayer = NNQPlayer("QLearner1")
+randPlayer = RandomPlayer()
 nnplayer2 = NNQPlayer("QLearner2")
+greedyplayer = EGreedyNNQPlayer("Greedy")
 
-game_number, p1_wins, p2_wins, draws = eval_players(nnplayer, nnplayer2)
+game_number, p1_wins, p2_wins, draws = eval_players(greedyplayer, randPlayer)
 
 p = plt.plot(game_number, draws, 'r-', game_number, p1_wins, 'g-', game_number, p2_wins, 'b-')
